@@ -16,8 +16,11 @@ func main() {
 	// 	})
 	// })
 	router.LoadHTMLGlob("templates/*.html")
+	// router.Static("/main.css", "../templates/main.css")
+	router.Static("templates", "./templates")
 	fmt.Println("In Main")
 	configs.ConnectDB()
 	routes.UserRoute(router)
+	
 	router.Run("localhost:8080")
 }
