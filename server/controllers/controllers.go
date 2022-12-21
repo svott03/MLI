@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	"fmt"
+	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -176,4 +177,38 @@ func GetMainPage() gin.HandlerFunc {
 		fmt.Println("In main controller...")
 		c.HTML(http.StatusOK, "index.html", nil)
 	}
+}
+
+func UploadModel() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println("uploadModel Controller...")
+		// file := c.Param("file")
+		// Func := c.Param("Func")
+		// fmt.Println(Func)
+		// file, _, err := c.Request.FormFile("file")
+		// _, _ = c.FormFile("file")
+		// if err != nil {
+		// 	fmt.Println("Errrr")
+		// }
+		fmt.Println("file Uploaded")
+		// if err != nil {
+			// c.JSON(http.StatusInternalServerError, responses.UserResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			// return
+		// }
+		// Func, header, err := c.Request.Body("Func")
+		// m := models.Upload{}
+		// m.file = file
+		// m.Func = Func
+    // meth := reflect.ValueOf(file).MethodByName(Func)
+    // meth.Call(nil)
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
+	}
+}
+
+// func (f multipart.File) upload_model() {
+// 	fmt.Println("upload_model called")
+// }
+
+func upload_model(f multipart.File) {
+	fmt.Println("upload_model called")
 }

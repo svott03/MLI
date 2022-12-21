@@ -1,6 +1,57 @@
 <!DOCTYPE html>
 
+
 <head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $(function () {
+      $('#modelForm').submit(function (e) {
+        e.preventDefault()  // prevent the form from 'submitting'
+
+        var url = e.target.action  // get the target
+        var formData = $(this).serialize() // get form data
+        console.log("In Upload Func");
+        $.ajax({
+          type: "POST",
+          url: "/uploadModel",
+          data: {
+            file: "string",
+          },
+          success: function (responseText) {
+            console.log(responseText.Output)
+            $("#modelOutput").text(responseText.Output);
+          },
+          error: function (data, status, errorString) {
+            console.log(data, status, errorString);
+            alert("Error in Uploading");
+          }
+        })
+      })
+    })
+
+    // function upload() {
+    //   // var u_file = $('#modelFile').prop('files');
+    //   // var fd = new FormData(document.getElementById("modelForm"));
+    //   console.log("In Upload Func");
+    //   $.ajax({
+    //     type: "POST",
+    //     url: "/uploadModel",
+    //     data: {
+    //       file: "string",
+    //     },
+    //     success: function (responseText) {
+    //       // alert(responseText.status);
+    //       $("#modelOutput").text(responseText.output);
+    //     },
+    //     error: function (data, status, errorString) {
+    //       console.log(data, status, errorString);
+    //       alert("Error in Uploading");
+    //     }
+    //   })
+    // }
+  </script>
+
+
   <meta charset="utf-8" />
   <title>MLI</title>
   <link href="templates/main.css" rel="stylesheet" type="text/css" />
@@ -46,7 +97,14 @@
                 <div class="post-info">|</div><a class="post-info when-link">.ipynb</a>
               </div>
               <p class="post-summary">Upload .ipynb source code for working model.
-              </p><input type="file" class="custom-file-input">
+              </p>
+
+              <form id="modelForm">
+                <input type="file" class="custom-file-input" id="modelFile">
+                <input type="submit">
+              </form>
+
+              <p class="post-summary" id="modelOutput"></p>
             </div>
           </div>
 
@@ -54,7 +112,7 @@
 
 
 
-          
+
           <div role="listitem" class="w-dyn-item">
             <div class="post-wrapper"><a class="blog-title-link w-inline-block">
                 <h1 class="blog-title">Upload Data</h1>
@@ -63,7 +121,8 @@
                 <div class="post-info">File Format</div>
                 <div class="post-info">|</div><a class="post-info when-link">.csv</a>
               </div>
-              <p class="post-summary">Upload csv Data. This should only be new data points. Size limit of 1GB. Original Training Data should be uploaded to sql database directly.
+              <p class="post-summary">Upload csv Data. This should only be new data points. Size limit of 1GB. Original
+                Training Data should be uploaded to sql database directly.
               </p>
 
               <input type="file" class="custom-file-input">

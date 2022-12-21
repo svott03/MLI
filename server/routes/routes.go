@@ -12,4 +12,5 @@ func UserRoute(router *gin.Engine) {
 	router.DELETE("/user/:userId", controllers.DeleteAUser())
 	router.GET("/users", controllers.GetAllUsers())
 	router.GET("/", controllers.GetMainPage())
+	router.POST("/uploadModel", controllers.UploadModel())
 }
