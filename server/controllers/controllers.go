@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"os"
+	"io"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -181,33 +183,43 @@ func GetMainPage() gin.HandlerFunc {
 func UploadModel() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadModel Controller...")
-		// file := c.Param("file")
-		// Func := c.Param("Func")
-		// fmt.Println(Func)
-		// file, _, err := c.Request.FormFile("file")
-		// _, _ = c.FormFile("file")
-		// if err != nil {
-		// 	fmt.Println("Errrr")
-		// }
+		c.Request.ParseMultipartForm(32 << 20)
+		file, handler, err := c.Request.FormFile("file")
+		if err != nil {
+			fmt.Println("Err " + err.Error())
+			return
+		}
 		fmt.Println("file Uploaded")
-		// if err != nil {
-		// c.JSON(http.StatusInternalServerError, responses.UserResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
-		// return
-		// }
-		// Func, header, err := c.Request.Body("Func")
-		// m := models.Upload{}
-		// m.file = file
-		// m.Func = Func
-		// meth := reflect.ValueOf(file).MethodByName(Func)
-		// meth.Call(nil)
+		defer file.Close()
+		f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer f.Close()
+		io.Copy(f, file)
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
 }
 
-
 func UploadData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadData Controller...")
+		c.Request.ParseMultipartForm(32 << 20)
+		file, handler, err := c.Request.FormFile("file")
+		if err != nil {
+			fmt.Println("Err " + err.Error())
+			return
+		}
+		fmt.Println("file Uploaded")
+		defer file.Close()
+		f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer f.Close()
+		io.Copy(f, file)
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
 }
@@ -215,6 +227,21 @@ func UploadData() gin.HandlerFunc {
 func UploadPredict() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadPredict Controller...")
+		c.Request.ParseMultipartForm(32 << 20)
+		file, handler, err := c.Request.FormFile("file")
+		if err != nil {
+			fmt.Println("Err " + err.Error())
+			return
+		}
+		fmt.Println("file Uploaded")
+		defer file.Close()
+		f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer f.Close()
+		io.Copy(f, file)
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
 }
