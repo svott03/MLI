@@ -10,45 +10,46 @@
 
         var url = e.target.action  // get the target
         var formData = $(this).serialize() // get form data
-        console.log("In Upload Func");
-        $.ajax({
-          type: "POST",
-          url: "/uploadModel",
-          data: {
-            file: "string",
-          },
-          success: function (responseText) {
-            console.log(responseText.Output)
-            $("#modelOutput").text(responseText.Output);
-          },
-          error: function (data, status, errorString) {
-            console.log(data, status, errorString);
-            alert("Error in Uploading");
-          }
-        })
+        upload(formData, "uploadModel", "modelOutput");
+      })
+    })
+    $(function () {
+      $('#dataForm').submit(function (e) {
+        e.preventDefault()  // prevent the form from 'submitting'
+
+        var url = e.target.action  // get the target
+        var formData = $(this).serialize() // get form data
+        upload(formData, "uploadData", "dataOutput");
+      })
+    })
+    $(function () {
+      $('#predictForm').submit(function (e) {
+        e.preventDefault()  // prevent the form from 'submitting'
+
+        var url = e.target.action  // get the target
+        var formData = $(this).serialize() // get form data
+        upload(formData, "uploadPredict", "predictOutput");
       })
     })
 
-    // function upload() {
-    //   // var u_file = $('#modelFile').prop('files');
-    //   // var fd = new FormData(document.getElementById("modelForm"));
-    //   console.log("In Upload Func");
-    //   $.ajax({
-    //     type: "POST",
-    //     url: "/uploadModel",
-    //     data: {
-    //       file: "string",
-    //     },
-    //     success: function (responseText) {
-    //       // alert(responseText.status);
-    //       $("#modelOutput").text(responseText.output);
-    //     },
-    //     error: function (data, status, errorString) {
-    //       console.log(data, status, errorString);
-    //       alert("Error in Uploading");
-    //     }
-    //   })
-    // }
+    function upload(formData, Func, u_output) {
+      console.log("In Upload Func");
+      $.ajax({
+        type: "POST",
+        url: "/" + Func,
+        data: {
+          file: formData,
+        },
+        success: function (responseText) {
+          console.log(responseText.Output)
+          $("#" + u_output).text(responseText.Output);
+        },
+        error: function (data, status, errorString) {
+          console.log(data, status, errorString);
+          alert("Error in Uploading");
+        }
+      })
+    }
   </script>
 
 
@@ -98,21 +99,14 @@
               </div>
               <p class="post-summary">Upload .ipynb source code for working model.
               </p>
-
               <form id="modelForm">
                 <input type="file" class="custom-file-input" id="modelFile">
                 <input type="submit">
               </form>
-
+              <br>
               <p class="post-summary" id="modelOutput"></p>
             </div>
           </div>
-
-
-
-
-
-
           <div role="listitem" class="w-dyn-item">
             <div class="post-wrapper"><a class="blog-title-link w-inline-block">
                 <h1 class="blog-title">Upload Data</h1>
@@ -125,10 +119,14 @@
                 Training Data should be uploaded to sql database directly.
               </p>
 
-              <input type="file" class="custom-file-input">
+              <form id="dataForm">
+                <input type="file" class="custom-file-input">
+                <input type="submit">
+              </form>
+              <br>
+              <p class="post-summary" id="dataOutput"></p>
             </div>
           </div>
-
           <div role="listitem" class="w-dyn-item">
             <div class="post-wrapper"><a class="blog-title-link w-inline-block">
                 <h1 class="blog-title">Train Model</h1>
@@ -138,11 +136,12 @@
                 <div class="post-info">|</div><a class="post-info when-link">.fit</a>
               </div>
               <p class="post-summary">Click Below to fit model to current Data.
-              </p><a href="/posts/steamed-siphon-froth-mazagran-cafe-au-lait" class="button-round w-button">Train
+              </p><a class="button-round w-button">Train
                 Model</a>
+              <br>
+              <p class="post-summary" id="trainOutput"></p>
             </div>
           </div>
-
           <div role="listitem" class="w-dyn-item">
             <div class="post-wrapper"><a class="blog-title-link w-inline-block">
                 <h1 class="blog-title">Predict</h1>
@@ -152,7 +151,14 @@
                 <div class="post-info">|</div><a class="post-info when-link">.csv</a>
               </div>
               <p class="post-summary">Click Below to upload instance for model to predict. Csv File should have 1 row.
-              </p><input type="file" class="custom-file-input">
+              </p>
+              <form id="predictForm">
+                <input type="file" class="custom-file-input">
+                <input type="submit">
+              </form>
+              <br>
+              <p class="post-summary" id="predictOutput"></p>
+
             </div>
           </div>
 

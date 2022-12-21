@@ -5,10 +5,9 @@ import (
 	"MLI/models"
 	"MLI/responses"
 	"context"
+	"fmt"
 	"net/http"
 	"time"
-	"fmt"
-	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -192,23 +191,29 @@ func UploadModel() gin.HandlerFunc {
 		// }
 		fmt.Println("file Uploaded")
 		// if err != nil {
-			// c.JSON(http.StatusInternalServerError, responses.UserResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
-			// return
+		// c.JSON(http.StatusInternalServerError, responses.UserResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		// return
 		// }
 		// Func, header, err := c.Request.Body("Func")
 		// m := models.Upload{}
 		// m.file = file
 		// m.Func = Func
-    // meth := reflect.ValueOf(file).MethodByName(Func)
-    // meth.Call(nil)
+		// meth := reflect.ValueOf(file).MethodByName(Func)
+		// meth.Call(nil)
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
 }
 
-// func (f multipart.File) upload_model() {
-// 	fmt.Println("upload_model called")
-// }
+func UploadData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println("uploadData Controller...")
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
+	}
+}
 
-func upload_model(f multipart.File) {
-	fmt.Println("upload_model called")
+func UploadPredict() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println("uploadPredict Controller...")
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
+	}
 }

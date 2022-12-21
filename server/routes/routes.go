@@ -13,4 +13,6 @@ func UserRoute(router *gin.Engine) {
 	router.GET("/users", controllers.GetAllUsers())
 	router.GET("/", controllers.GetMainPage())
 	router.POST("/uploadModel", controllers.UploadModel())
+	router.POST("/uploadData", controllers.UploadData())
+	router.POST("/uploadPredict", controllers.UploadPredict())
 }
