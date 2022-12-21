@@ -204,6 +204,7 @@ func UploadModel() gin.HandlerFunc {
 	}
 }
 
+
 func UploadData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadData Controller...")
@@ -214,6 +215,13 @@ func UploadData() gin.HandlerFunc {
 func UploadPredict() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadPredict Controller...")
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
+	}
+}
+
+func Train() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println("Train Controller...")
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
 }

@@ -31,6 +31,20 @@
         upload(formData, "uploadPredict", "predictOutput");
       })
     })
+    function train() {
+      $.ajax({
+        type: "GET",
+        url: "/train",
+        success: function (responseText) {
+          console.log(responseText.Output)
+          $("#trainOutput").text(responseText.Output);
+        },
+        error: function (data, status, errorString) {
+          console.log(data, status, errorString);
+          alert("Error in Training");
+        }
+      })
+    }
 
     function upload(formData, Func, u_output) {
       console.log("In Upload Func");
@@ -136,8 +150,9 @@
                 <div class="post-info">|</div><a class="post-info when-link">.fit</a>
               </div>
               <p class="post-summary">Click Below to fit model to current Data.
-              </p><a class="button-round w-button">Train
-                Model</a>
+              </p><button onclick="train();" id="trainBtn" class="button-round w-button">Train
+                Model</button>
+              <br>
               <br>
               <p class="post-summary" id="trainOutput"></p>
             </div>
