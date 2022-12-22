@@ -14,8 +14,6 @@ func main() {
 	// 		"data": "Hello from Gin-gonic & mongoDB",
 	// 	})
 	// })
-	router.LoadHTMLGlob("templates/*.html")
-	router.Static("templates", "./templates")
 	configs.ConnectDB()
 	routes.UserRoute(router)
 	router.Run("localhost:9090")

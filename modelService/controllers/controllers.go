@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"net/http"
 	// "time"
-	"os"
-	"os/exec"
 	"io"
 	"log"
+	"os"
+	// "bytes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -88,7 +88,6 @@ var validate = validator.New()
 // 	}
 // }
 
-
 func UploadModel() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadModel Controller...")
@@ -113,34 +112,50 @@ func UploadModel() gin.HandlerFunc {
 
 func UploadData() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("uploadData Controller...")
-		c.Request.ParseMultipartForm(32 << 20)
-		file, handler, err := c.Request.FormFile("file")
+		fmt.Println("In modelService UploadData")
+		// var b *bytes.Buffer
+		buf, err := io.ReadAll(c.Request.Body)
+		// err := c.ShouldBind(&b);
 		if err != nil {
-			fmt.Println("Err " + err.Error())
-			return
-		}
-		fmt.Println("file Uploaded")
-		defer file.Close()
-		f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer f.Close()
-		io.Copy(f, file)
-
-		// put data into database
-		cmd := exec.Command("mongoimport", "--uri $MONGO_KEY -d MyDatabase --collection meal_info --type=csv --headerline --file ~/Desktop/meal_info_new.csv")
-
-    err2 := cmd.Run()
-
-    if err2 != nil {
-        log.Fatal(err)
+			fmt.Println("bad request")
+      return
     }
+		// buf := b.Bytes()
+		fmt.Println("Finished Read")
+		err4 := os.WriteFile("./files/testFile.txt", buf, 0644)
+		if err4 != nil {
+			log.Fatal(err4)
+			return
+		}
 
+		// fmt.Println("uploadData Controller...")
+		// c.Request.ParseMultipartForm(32 << 20)
+		// file, handler, err := c.Request.FormFile("file")
+		// if err != nil {
+		// 	fmt.Println("Err " + err.Error())
+		// 	return
+		// }
+		// fmt.Println("file Uploaded")
+		// defer file.Close()
+		// f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	return
+		// }
+		// defer f.Close()
+		// io.Copy(f, file)
 
-		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Data Uploaded"})
+		// // put data into database
+		// cmd := exec.Command("mongoimport", "--uri $MONGO_KEY -d MyDatabase --collection meal_info --type=csv --headerline --file ~/Desktop/meal_info_new.csv")
+
+		// err2 := cmd.Run()
+
+		// if err2 != nil {
+		// 	log.Fatal(err)
+		// 	return
+		// }
+
+		// c.JSON(http.StatusOK, responses.BasicResponse{Output: "Data Uploaded"})
 	}
 }
 

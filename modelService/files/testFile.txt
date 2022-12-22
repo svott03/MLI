@@ -1,0 +1,2 @@
+meal_id,category,cuisine
+6666,Beverages,Thai

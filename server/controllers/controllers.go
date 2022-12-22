@@ -4,14 +4,14 @@ import (
 	"MLI/configs"
 	"MLI/models"
 	"MLI/responses"
+	"bytes"
 	"context"
 	"fmt"
-	"net/http"
-	"time"
-	"os"
 	"io"
-	// "log"
-	// "net/http"
+	"log"
+	"net/http"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -136,7 +136,26 @@ func UploadData() gin.HandlerFunc {
 		defer f.Close()
 		io.Copy(f, file)
 
+		data, err2 := os.ReadFile("./files/" + handler.Filename)
+		if err2 != nil {
+			log.Fatal(err2)
+		}
+		b := bytes.NewBuffer(data)
+		buf := b.Bytes()
+		err4 := os.WriteFile("./files/testFile.txt", buf, 0644)
+		if err4 != nil {
+			log.Fatal(err4)
+			return
+		}
 
+
+		req, _ := http.NewRequest("POST", "http://localhost:9090/uploadData", bytes.NewBuffer(data))
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Printf("client: error making http request: %s\n", err)
+			return
+		}
+		fmt.Printf("client: status code: %d\n", res.StatusCode)
 
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
