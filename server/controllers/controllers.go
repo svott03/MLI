@@ -10,8 +10,8 @@ import (
 	"time"
 	"os"
 	"io"
-	"log"
-	"net/http"
+	// "log"
+	// "net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -106,7 +106,7 @@ func UploadModel() gin.HandlerFunc {
 		}
 		fmt.Println("file Uploaded")
 		defer file.Close()
-		f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		f, err := os.OpenFile("./files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -128,7 +128,7 @@ func UploadData() gin.HandlerFunc {
 		}
 		fmt.Println("file Uploaded")
 		defer file.Close()
-		f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		f, err := os.OpenFile("./files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -136,7 +136,7 @@ func UploadData() gin.HandlerFunc {
 		defer f.Close()
 		io.Copy(f, file)
 
-		
+
 
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
@@ -153,7 +153,7 @@ func UploadPredict() gin.HandlerFunc {
 		}
 		fmt.Println("file Uploaded")
 		defer file.Close()
-		f, err := os.OpenFile("../files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		f, err := os.OpenFile("./files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println(err)
 			return
