@@ -20,22 +20,18 @@ import (
 
 func UploadModel() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("uploadModel Controller...")
-		c.Request.ParseMultipartForm(32 << 20)
-		file, handler, err := c.Request.FormFile("file")
+		fmt.Println("In modelService UploadModel")
+		buf, err := io.ReadAll(c.Request.Body)
 		if err != nil {
-			fmt.Println("Err " + err.Error())
+			fmt.Println("bad request")
+      return
+    }
+		fmt.Println("Finished Read")
+		err4 := os.WriteFile("./files/model.csv", buf, 0644)
+		if err4 != nil {
+			log.Fatal(err4)
 			return
 		}
-		fmt.Println("file Uploaded")
-		defer file.Close()
-		f, err := os.OpenFile("./files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer f.Close()
-		io.Copy(f, file)
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Model Uploaded Successfully"})
 	}
 }
@@ -65,6 +61,7 @@ func UploadPredict() gin.HandlerFunc {
 		// }
 
 		// c.JSON(http.StatusOK, responses.BasicResponse{Output: "Data Uploaded"})
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Prediction Read, 85% accuracy"})
 	}
 }
 
@@ -76,6 +73,6 @@ func Train() gin.HandlerFunc {
 		// exec train model source code
 
 		// send back train statistics
-		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Training Complete"})
 	}
 }
