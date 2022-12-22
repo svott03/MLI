@@ -10,6 +10,8 @@ import (
 	"time"
 	"os"
 	"io"
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -133,6 +135,9 @@ func UploadData() gin.HandlerFunc {
 		}
 		defer f.Close()
 		io.Copy(f, file)
+
+		
+
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "complete"})
 	}
 }
