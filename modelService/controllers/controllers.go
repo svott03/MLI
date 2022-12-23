@@ -3,13 +3,14 @@ package controllers
 import (
 	// "modelService/configs"
 	// "modelService/models"
-	"modelService/responses"
 	"fmt"
+	"modelService/responses"
 	"net/http"
 	// "time"
 	"io"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/gin-gonic/gin"
 	// "github.com/go-playground/validator/v10"
@@ -24,10 +25,10 @@ func UploadModel() gin.HandlerFunc {
 		buf, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			fmt.Println("bad request")
-      return
-    }
+			return
+		}
 		fmt.Println("Finished Read")
-		err4 := os.WriteFile("./files/model.csv", buf, 0644)
+		err4 := os.WriteFile("./files/model.py", buf, 0644)
 		if err4 != nil {
 			log.Fatal(err4)
 			return
@@ -42,14 +43,17 @@ func UploadPredict() gin.HandlerFunc {
 		buf, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			fmt.Println("bad request")
-      return
-    }
+			return
+		}
 		fmt.Println("Finished Read")
 		err4 := os.WriteFile("./files/predict.csv", buf, 0644)
 		if err4 != nil {
 			log.Fatal(err4)
 			return
 		}
+		//check if source code exists
+
+
 		//exec source code on predict input
 		// cmd := os.exec.Command("mongoimport", "--uri $MONGO_KEY -d MyDatabase --collection meal_info --type=csv --headerline --file ~/Desktop/meal_info_new.csv")
 
@@ -69,10 +73,26 @@ func Train() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("In modelService Train")
 		//check if source code exists
+		if _, err := os.Stat("model.py"); err == nil {
+			fmt.Printf("File exists\n")
+		} else {
+			fmt.Printf("File does not exist\n")
+			c.JSON(http.StatusConflict, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
+			return
+		}
+		//grab data
+
+
 
 		// exec train model source code
-
+		cmd := exec.Command("zsh", "-c", "python3 model.py")
+		out, err3 := cmd.Output()
+		if err3 != nil {
+			fmt.Println("could not run command: ", err3)
+			return
+		}
+		fmt.Println("Output: ", string(out))
 		// send back train statistics
-		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Training Complete"})
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Training Complete " + string(out)})
 	}
 }
