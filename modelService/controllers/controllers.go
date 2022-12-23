@@ -73,7 +73,7 @@ func Train() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("In modelService Train")
 		//check if source code exists
-		if _, err := os.Stat("model.py"); err == nil {
+		if _, err := os.Stat("./files/model.py"); err == nil {
 			fmt.Printf("File exists\n")
 		} else {
 			fmt.Printf("File does not exist\n")
@@ -85,7 +85,7 @@ func Train() gin.HandlerFunc {
 
 
 		// exec train model source code
-		cmd := exec.Command("zsh", "-c", "python3 model.py")
+		cmd := exec.Command("zsh", "-c", "python3 ./files/model.py")
 		out, err3 := cmd.Output()
 		if err3 != nil {
 			fmt.Println("could not run command: ", err3)
@@ -93,6 +93,6 @@ func Train() gin.HandlerFunc {
 		}
 		fmt.Println("Output: ", string(out))
 		// send back train statistics
-		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Training Complete " + string(out)})
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Training Complete. Output: " + string(out)})
 	}
 }
