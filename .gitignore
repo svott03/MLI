@@ -1,4 +1,7 @@
 *.DS_Store
 ./modelService/.DS_Store
-./modelService/files
-./server/files
+./modelService/files/*.csv
+./modelService/files/*.py
+./modelService/files/*.sav
+./server/files/*.csv
+./server/files/*.py
