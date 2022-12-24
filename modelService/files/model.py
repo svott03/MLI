@@ -11,10 +11,10 @@ Original file is located at
 import pandas as pd
 import numpy as np
 
-center_info = pd.read_csv('./fulfilment_center_info.csv')
-meal_info = pd.read_csv('./meal_info.csv')
-test_data = pd.read_csv('./test.csv')
-train_data = pd.read_csv('./train.csv')
+center_info = pd.read_csv('./files/fulfilment_center_info.csv')
+meal_info = pd.read_csv('./files/meal_info.csv')
+test_data = pd.read_csv('./files/test.csv')
+train_data = pd.read_csv('./files/train.csv')
 
 merge1 = pd.merge(train_data, center_info, how='inner', on='Center_id')
 df = pd.merge(merge1, meal_info, how='inner', on='Meal_id')

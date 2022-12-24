@@ -72,6 +72,7 @@ func UploadPredict() gin.HandlerFunc {
 			fmt.Println("could not run command: ", err3)
 			return
 		}
+		fmt.Println("Prediction: " + string(out))
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Prediction: " + string(out)})
 	}
 }
