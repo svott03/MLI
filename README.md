@@ -55,5 +55,5 @@ go run main.go
 Open "http://localhost:8080". Explanations for each piece of functionality are on the website. Enjoy!
 
 
-## How:
+## High-Level-Description:
 We have the standard client-server interaction between your browser and our server directory. Our server dynamically updates html, sends data to the db, and sends workload requests to our modelService. Our modelService then accesses the db, runs your source code to train and use the model and sends results back to the server. We are using the gin-gonic framework to send requests in golang.
