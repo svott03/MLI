@@ -13,7 +13,7 @@ cd MLI
 make
 ```
 
-2. We require 2 source code files: model.py for training and prediction.py for prediction.
+2. We require 2 source code files: model.py for training and prediction.py for prediction. Our source directory contains source code and data for testing purposes.
 
 - Update model.py to only output training results (txt).
 - Update predcition.py to only output prediction results (txt).
