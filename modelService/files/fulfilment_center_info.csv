@@ -1,4 +1,4 @@
-center_id,city_code,region_code,center_type,op_area
+Center_id,city_code,region_code,center_type,op_area
 11,679,56,TYPE_A,3.7
 13,590,56,TYPE_B,6.7
 124,590,56,TYPE_C,4

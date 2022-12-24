@@ -1,11 +1,11 @@
 package models
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	// "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Instance struct {
-	ObjId       primitive.ObjectID `bson:"_id,omitempty"`
+	// ObjId       primitive.ObjectID `bson:"_id,omitempty"`
 	Id 			 int32								`bson:"id"`
 	Week 		int32 								`bson:"week"`
 	Center_id int32								`bson:"center_id"`

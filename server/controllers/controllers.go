@@ -88,13 +88,13 @@ func UploadData() gin.HandlerFunc {
 
 		fmt.Println("file Uploaded")
 		// put data into database
-		cmd := exec.Command("zsh", "-c", "mongoimport --uri $MONGO_KEY -d MyDatabase --collection meal_info --type=csv --headerline --file ./files/"+handler.Filename)
+		cmd := exec.Command("zsh", "-c", "mongoimport --uri $MONGO_KEY -d MyDatabase --collection train_data --type=csv --headerline --file ./files/"+handler.Filename)
 		out, err3 := cmd.Output()
 		if err3 != nil {
 			fmt.Println("could not run command: ", err3)
 			return
 		}
-		fmt.Println("Output: ", string(out))
+		fmt.Println("Output: " + string(out))
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Data Uploaded Successfully"})
 	}
 }

@@ -1,23 +1,26 @@
 package controllers
 
 import (
-	"modelService/configs"
-	"modelService/models"
+	"context"
 	"fmt"
-	"modelService/responses"
-	"net/http"
-	"time"
 	"io"
 	"log"
+	"modelService/configs"
+	"modelService/models"
+	"modelService/responses"
+	"net/http"
 	"os"
 	"os/exec"
+	"reflect"
 	"strconv"
-	"context"
+	"time"
 
+	// "github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
+	"github.com/gocarina/gocsv"
 	"go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var collection *mongo.Collection = configs.GetCollection(configs.DB, "train_data")
@@ -86,36 +89,80 @@ func Train() gin.HandlerFunc {
 		}
 		//grab data
 		res, _ := os.ReadFile("./files/numRecords.txt")
-		prevRecords, _ := strconv.Atoi(string(res))
+		s := string(res)
+		s = s[:len(s)-1]
+		prevRecords, _ := strconv.Atoi(s)
 		fmt.Println(prevRecords)
 		// collection.find().skip(collection.count() - prevRecords)
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 80*time.Second)
 		var train_data []models.Instance
 		defer cancel()
-
-		results, err := collection.Find(ctx, bson.M{})
-
+		// myOptions := options.Find()
+		// myOptions.SetSort(bson.M{"$natural": prevRecords})
+		opts := options.Find().SetSort(bson.D{{"$natural", 1}}).SetSkip(int64(prevRecords))
+		results, err := collection.Find(ctx, bson.M{},
+			opts,
+		)
+		// results.skip(prevRecords)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Loading Training Data"})
 			return
 		}
 
 		//reading from the db in an optimal way
+		w, _ := os.OpenFile("./files/train.csv", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		newly_added := 0
 		defer results.Close(ctx)
 		for results.Next(ctx) {
 			var instance models.Instance
 			var m bson.M
 			err = results.Decode(&m)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Model Source Code"})
+				c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Loading Training Data"})
 				return
 			}
-			fmt.Println(m)
 			bsonBytes, _ := bson.Marshal(m)
 			_ = bson.Unmarshal(bsonBytes, &instance)
-			fmt.Println(instance)
 			train_data = append(train_data, instance)
+			newly_added++
+			if prevRecords != 0 {
+				// new_inst, _ := gocsv.MarshalString(&s)
+				var s string = "\n"
+				v := reflect.ValueOf(instance)
+
+				for i := 0; i < v.NumField(); i++ {
+					temp := fmt.Sprintf("%v,", v.Field(i).Interface())
+					s += temp
+				}
+				s = s[:len(s)-1]
+				fmt.Println(s)
+				if _, err := w.WriteString(s); err != nil {
+					//write failed do something
+					log.Fatal("Error appending new data")
+					return
+				}
+			}
+		}
+		fmt.Println(newly_added)
+		prevRecords += newly_added
+		// Write size of db to file
+		f, _ := os.Create("./files/numRecords.txt")
+		defer f.Close()
+		_, _ = f.WriteString(fmt.Sprintf("%d\n", prevRecords))
+
+		fmt.Println(len(train_data))
+		//output to csv file
+		// to download file inside downloads folder
+		file, err := os.OpenFile("./files/train.csv", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer file.Close()
+		// remove header line
+		if prevRecords-newly_added == 0 {
+			gocsv.MarshalFile(&train_data, file)
 		}
 
 		// exec train model source code

@@ -9,55 +9,51 @@ Original file is located at
 
 # Commented out IPython magic to ensure Python compatibility.
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
-from mpl_toolkits.mplot3d import Axes3D
 
-center_info = pd.read_csv('./files/fulfilment_center_info.csv')
-meal_info = pd.read_csv('./files/meal_info.csv')
-test_data = pd.read_csv('./files/test.csv')
-train_data = pd.read_csv('./files/train.csv')
+center_info = pd.read_csv('./fulfilment_center_info.csv')
+meal_info = pd.read_csv('./meal_info.csv')
+test_data = pd.read_csv('./test.csv')
+train_data = pd.read_csv('./train.csv')
 
-merge1 = pd.merge(train_data, center_info, how='inner', on='center_id')
-df = pd.merge(merge1, meal_info, how='inner', on='meal_id')
-df = df.sort_values(by=['week'])
+merge1 = pd.merge(train_data, center_info, how='inner', on='Center_id')
+df = pd.merge(merge1, meal_info, how='inner', on='Meal_id')
+df = df.sort_values(by=['Week'])
 df = df.dropna()
 
 cat_var = ['center_type',
  'category',
  'cuisine']
 
-num_cols=['center_id',
-'meal_id',
-'checkout_price',
-'base_price',
-'emailer_for_promotion',
-'homepage_featured',
-'num_orders',
+num_cols=['Center_id',
+'Meal_id',
+'Checkout_price',
+'Base_price',
+'Emailer_for_promotion',
+'Homepage_featured',
+'Num_orders',
 'city_code',
 'region_code',
 'op_area']
 colors=['#b84949', '#ff6f00', '#ffbb00', '#9dff00', '#329906', '#439c55', '#67c79e', '#00a1db', '#002254', '#5313c2', '#c40fdb', '#e354aa']
-ts_tot_orders = df.groupby(['week'])['num_orders'].sum()
+ts_tot_orders = df.groupby(['Week'])['Num_orders'].sum()
 ts_tot_orders = pd.DataFrame(ts_tot_orders)
 
 df_ = df.copy()
 for i in cat_var:
     df_[i] = pd.factorize(df_[i])[0]
 
-import seaborn as seabornInstance 
 from sklearn.model_selection import train_test_split 
 # %matplotlib inline
 
-X = df_.drop(['num_orders'], axis=1).values
-y = df_['num_orders'].values
+X = df_.drop(['Num_orders'], axis=1).values
+y = df_['Num_orders'].values
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
 import xgboost as xgb
-from sklearn.metrics import auc, accuracy_score, confusion_matrix, mean_squared_error
+from sklearn.metrics import mean_squared_error
 import pickle
 
 from sklearn.model_selection import GridSearchCV
@@ -65,7 +61,7 @@ from sklearn.model_selection import GridSearchCV
 # Various hyper-parameters to tune
 xgb1 = xgb.XGBRegressor()
 parameters = {'nthread':[4], #when use hyperthread, xgboost may become slower
-              'objective':['reg:linear'],
+              'objective':['reg:squarederror'],
               'learning_rate': [.03, 0.05, .07], #so called `eta` value
               'max_depth': [5, 6, 7],
               'min_child_weight': [4],
