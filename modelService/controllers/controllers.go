@@ -15,7 +15,6 @@ import (
 	"strconv"
 	"time"
 
-	// "github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 	"github.com/gocarina/gocsv"
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,12 +30,14 @@ func UploadModel() gin.HandlerFunc {
 		buf, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			fmt.Println("bad request")
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Uploading Model"})
 			return
 		}
 		fmt.Println("Finished Read")
 		err4 := os.WriteFile("./files/model.py", buf, 0644)
 		if err4 != nil {
 			log.Fatal(err4)
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Writing File"})
 			return
 		}
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Model Uploaded Successfully"})
@@ -49,12 +50,14 @@ func UploadPredict() gin.HandlerFunc {
 		buf, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			fmt.Println("bad request")
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Uploading Prediction"})
 			return
 		}
 		fmt.Println("Finished Read")
 		err4 := os.WriteFile("./files/predict.csv", buf, 0644)
 		if err4 != nil {
 			log.Fatal(err4)
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Reading File"})
 			return
 		}
 		//check if source code exists
@@ -62,7 +65,7 @@ func UploadPredict() gin.HandlerFunc {
 			fmt.Printf("File exists\n")
 		} else {
 			fmt.Printf("File does not exist\n")
-			c.JSON(http.StatusConflict, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
 			return
 		}
 		// exec train model source code
@@ -70,7 +73,8 @@ func UploadPredict() gin.HandlerFunc {
 		out, err3 := cmd.Output()
 		if err3 != nil {
 			fmt.Println("could not run command: ", err3)
-			return
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Executing prediction.py"})
+			return	
 		}
 		fmt.Println("Prediction: " + string(out))
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Prediction: " + string(out)})
@@ -85,7 +89,7 @@ func Train() gin.HandlerFunc {
 			fmt.Printf("File exists\n")
 		} else {
 			fmt.Printf("File does not exist\n")
-			c.JSON(http.StatusConflict, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
 			return
 		}
 		//grab data
@@ -141,6 +145,7 @@ func Train() gin.HandlerFunc {
 				if _, err := w.WriteString(s); err != nil {
 					//write failed do something
 					log.Fatal("Error appending new data")
+					c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Writing to train.csv"})
 					return
 				}
 			}
@@ -158,6 +163,7 @@ func Train() gin.HandlerFunc {
 		file, err := os.OpenFile("./files/train.csv", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			fmt.Println(err)
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in opening train.csv"})
 			return
 		}
 		defer file.Close()

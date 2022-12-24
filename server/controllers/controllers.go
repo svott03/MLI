@@ -142,7 +142,11 @@ func UploadPredict() gin.HandlerFunc {
 			log.Fatal(err)
 			return
 		}
-		c.JSON(http.StatusOK, out)
+		if (res.StatusCode == 200) {
+			c.JSON(http.StatusOK, out)
+		} else {
+			c.String(http.StatusInternalServerError, out.Output)
+		}
 	}
 }
 
@@ -173,7 +177,7 @@ func Train() gin.HandlerFunc {
 		if (res.StatusCode == 200) {
 			c.JSON(http.StatusOK, out)
 		} else {
-			c.String(http.StatusConflict, out.Output)
+			c.String(http.StatusInternalServerError, out.Output)
 		}
 	}
 }

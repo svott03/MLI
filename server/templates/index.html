@@ -82,6 +82,7 @@
         error: function (data, status, errorString) {
           console.log(data, status, errorString);
           alert("Error in Uploading");
+          $("#" + u_output).text(data.responseText);
         }
       })
     }
