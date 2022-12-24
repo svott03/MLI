@@ -19,6 +19,7 @@ make
 - Update predcition.py to only output prediction results (txt).
 - Place your prediction.py in ~/MLI/modelService/files.
 - Create a numRecords.txt file in ~/MLI/modelService/files with an integer 0 and newline
+- Place extra csv files for data preparation in ~/MLI/modelService/files
 
 3. We are using MongoDB. Follow a quickstart guide to create a cluster and a database ("databaseName") with your local IP address. To connect with your database, go to Connect, choose Connect with your application and copy your Mongo URI. Replace "password" with your account password. This URI string will be used later. Create a collection with name "trainingCollectionName".
 
