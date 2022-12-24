@@ -1,6 +1,7 @@
 Setup MongoDB with your current IP Address. Put MongoDB API Key in .env variable called MONGO_KEY. Upload original training Data to MongoDB. Now clone repo and execute "go run main.go". Open "http://localhost:8080/index.html". Now use GUI to upload new data points, train model, and run model!
 
 
+Write a prediction script and import it into modelService/files
 
 Initialize MongoDB
 

@@ -52,20 +52,21 @@ func UploadPredict() gin.HandlerFunc {
 			return
 		}
 		//check if source code exists
-
-
-		//exec source code on predict input
-		// cmd := os.exec.Command("mongoimport", "--uri $MONGO_KEY -d MyDatabase --collection meal_info --type=csv --headerline --file ~/Desktop/meal_info_new.csv")
-
-		// err2 := cmd.Run()
-
-		// if err2 != nil {
-		// 	log.Fatal(err)
-		// 	return
-		// }
-
-		// c.JSON(http.StatusOK, responses.BasicResponse{Output: "Data Uploaded"})
-		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Prediction Read, 85% accuracy"})
+		if _, err := os.Stat("./files/model.py"); err == nil {
+			fmt.Printf("File exists\n")
+		} else {
+			fmt.Printf("File does not exist\n")
+			c.JSON(http.StatusConflict, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
+			return
+		}
+		// exec train model source code
+		cmd := exec.Command("zsh", "-c", "python3 ./files/prediction.py")
+		out, err3 := cmd.Output()
+		if err3 != nil {
+			fmt.Println("could not run command: ", err3)
+			return
+		}
+		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Prediction: " + string(out)})
 	}
 }
 
@@ -89,6 +90,7 @@ func Train() gin.HandlerFunc {
 		out, err3 := cmd.Output()
 		if err3 != nil {
 			fmt.Println("could not run command: ", err3)
+			c.JSON(http.StatusConflict, responses.BasicResponse{Output: "Error in Model Source Code"})
 			return
 		}
 		fmt.Println("Output: ", string(out))

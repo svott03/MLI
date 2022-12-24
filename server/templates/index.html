@@ -27,33 +27,41 @@
     })
     function train() {
       //Update donut
-      $("#doughnut").css({"border": "20px solid", "border-color": "#ff6817",
-    "border-radius": "100px",
-    "height": "100px",
-    "width": "100px",
-    "margin-top": "25px"});
+      $("#doughnut").css({
+        "border": "20px solid", "border-color": "#ff6817",
+        "border-radius": "100px",
+        "height": "100px",
+        "width": "100px",
+        "margin-top": "25px"
+      });
       $.ajax({
         type: "GET",
         url: "/train",
         success: function (responseText) {
-          console.log(responseText.Output)
+          console.log(responseText)
           //Update donut
-          $("#doughnut").css({"border": "20px solid", "border-color": "#00d604",
-    "border-radius": "100px",
-    "height": "100px",
-    "width": "100px",
-    "margin-top": "25px"});
+          $("#doughnut").css({
+            "border": "20px solid", "border-color": "#00d604",
+            "border-radius": "100px",
+            "height": "100px",
+            "width": "100px",
+            "margin-top": "25px"
+          });
           $("#trainOutput").text(responseText.Output);
         },
         error: function (data, status, errorString) {
           console.log(data, status, errorString);
           //Update donut
-          $("#doughnut").css({"border": "20px solid", "border-color": "#ff5349",
-    "border-radius": "100px",
-    "height": "100px",
-    "width": "100px",
-    "margin-top": "25px"});
+          $("#doughnut").css({
+            "border": "20px solid", "border-color": "#ff5349",
+            "border-radius": "100px",
+            "height": "100px",
+            "width": "100px",
+            "margin-top": "25px"
+          });
           alert("Error in Training");
+          console.log(data.responseText)
+          $("#trainOutput").text(data.responseText);
         }
       })
     }

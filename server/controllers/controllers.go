@@ -169,10 +169,11 @@ func Train() gin.HandlerFunc {
 			log.Fatal(err)
 			return
 		}
+		fmt.Println("OUT " + out.Output)
 		if (res.StatusCode == 200) {
 			c.JSON(http.StatusOK, out)
 		} else {
-			c.JSON(http.StatusConflict, out)
+			c.String(http.StatusConflict, out.Output)
 		}
 	}
 }
