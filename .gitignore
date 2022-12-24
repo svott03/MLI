@@ -1,2 +1,4 @@
 *.DS_Store
 ./modelService/.DS_Store
+./modelService/files
+./server/files
