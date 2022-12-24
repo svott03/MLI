@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"MLI/responses"
+	"MLI/configs"
 	"bytes"
 	"fmt"
 	"io"
@@ -91,7 +92,7 @@ func UploadData() gin.HandlerFunc {
 
 		fmt.Println("file Uploaded")
 		// Insert new training data into database
-		cmd := exec.Command("zsh", "-c", "mongoimport --uri $MONGO_KEY -d MyDatabase --collection train_data --type=csv --headerline --file ./files/"+handler.Filename)
+		cmd := exec.Command("zsh", "-c", "mongoimport --uri $MONGO_KEY -d " + configs.EnvMongoDb() + " --collection " + configs.EnvMongoTrainCollection() + " --type=csv --headerline --file ./files/"+handler.Filename)
 		out, err3 := cmd.Output()
 		if err3 != nil {
 			fmt.Println("could not run command: ", err3)

@@ -9,10 +9,7 @@ Original file is located at
 
 # Commented out IPython magic to ensure Python compatibility.
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
-from mpl_toolkits.mplot3d import Axes3D
 
 center_info = pd.read_csv('./files/fulfilment_center_info.csv')
 meal_info = pd.read_csv('./files/meal_info.csv')
@@ -46,7 +43,6 @@ df_ = df.copy()
 for i in cat_var:
     df_[i] = pd.factorize(df_[i])[0]
 
-import seaborn as seabornInstance 
 from sklearn.model_selection import train_test_split 
 # %matplotlib inline
 
@@ -57,7 +53,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 
 import xgboost as xgb
-from sklearn.metrics import auc, accuracy_score, confusion_matrix, mean_squared_error
+from sklearn.metrics import mean_squared_error
 import pickle
 
 from sklearn.model_selection import GridSearchCV

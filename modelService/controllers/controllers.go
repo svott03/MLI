@@ -22,7 +22,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var collection *mongo.Collection = configs.GetCollection(configs.DB, "train_data")
+var collection *mongo.Collection = configs.GetCollection(configs.DB, configs.EnvMongoTrainCollection())
 
 func UploadModel() gin.HandlerFunc {
 	return func(c *gin.Context) {
