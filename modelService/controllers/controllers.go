@@ -1,23 +1,26 @@
 package controllers
 
 import (
-	// "modelService/configs"
-	// "modelService/models"
+	"modelService/configs"
+	"modelService/models"
 	"fmt"
 	"modelService/responses"
 	"net/http"
-	// "time"
+	"time"
 	"io"
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
+	"context"
 
 	"github.com/gin-gonic/gin"
-	// "github.com/go-playground/validator/v10"
-	// "go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson"
 	// "go.mongodb.org/mongo-driver/bson/primitive"
-	// "go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo"
 )
+
+var collection *mongo.Collection = configs.GetCollection(configs.DB, "train_data")
 
 func UploadModel() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -82,15 +85,45 @@ func Train() gin.HandlerFunc {
 			return
 		}
 		//grab data
+		res, _ := os.ReadFile("./files/numRecords.txt")
+		prevRecords, _ := strconv.Atoi(string(res))
+		fmt.Println(prevRecords)
+		// collection.find().skip(collection.count() - prevRecords)
 
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var train_data []models.Instance
+		defer cancel()
 
+		results, err := collection.Find(ctx, bson.M{})
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Loading Training Data"})
+			return
+		}
+
+		//reading from the db in an optimal way
+		defer results.Close(ctx)
+		for results.Next(ctx) {
+			var instance models.Instance
+			var m bson.M
+			err = results.Decode(&m)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Model Source Code"})
+				return
+			}
+			fmt.Println(m)
+			bsonBytes, _ := bson.Marshal(m)
+			_ = bson.Unmarshal(bsonBytes, &instance)
+			fmt.Println(instance)
+			train_data = append(train_data, instance)
+		}
 
 		// exec train model source code
 		cmd := exec.Command("zsh", "-c", "python3 ./files/model.py")
 		out, err3 := cmd.Output()
 		if err3 != nil {
 			fmt.Println("could not run command: ", err3)
-			c.JSON(http.StatusConflict, responses.BasicResponse{Output: "Error in Model Source Code"})
+			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Model Source Code"})
 			return
 		}
 		fmt.Println("Output: ", string(out))
