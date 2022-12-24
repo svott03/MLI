@@ -7,7 +7,7 @@ If you want to train your model on new data points without interacting directly 
 ## Setup:
 1. Clone our Repository and install python dependencies
 ```bash
-cd~
+cd ~
 git clone https://github.com/svott03/MLI.git
 cd MLI
 make
@@ -19,7 +19,7 @@ make
 - Update predcition.py to only output prediction results (txt).
 - Place your prediction.py in ~/MLI/modelService/files.
 
-3. We are using MongoDB. Follow a quickstart guide to create a cluster and a database (<databaseName>) with your local IP address. To connect with your database, go to Connect, choose Connect with your application and copy your Mongo URI. Replace <password> with your account password. This URI string will be used later. Create a collection with name <trainingCollectionName>.
+3. We are using MongoDB. Follow a quickstart guide to create a cluster and a database ("databaseName") with your local IP address. To connect with your database, go to Connect, choose Connect with your application and copy your Mongo URI. Replace "password" with your account password. This URI string will be used later. Create a collection with name "trainingCollectionName".
 
 Now create the following environment variables for your URI, database name, and training collection.
 ```bash
@@ -33,20 +33,20 @@ Install the MongoDB Database-tools suite on your local machine.
 brew install mongodb-database-tools
 ```
 
-Import your training data (from <training_file_path>) with the following:
+Import your training data (from "training_file_path") with the following:
 ```bash
-mongoimport --uri $MONGO_KEY -d $MongoDB --collection $MongoTrainData --type=csv --headerline --file <training_file_path>
+mongoimport --uri $MONGO_KEY -d $MongoDB --collection $MongoTrainData --type=csv --headerline --file "training_file_path"
 ```
 
 ## Run:
 1. Open 2 terminal instances and export env variables to both instances. Now start both servers.
 ```bash
-cd~/MLI/server
+cd ~/MLI/server
 go run main.go
 ```
 
 ```bash
-cd~/MLI/modelService
+cd ~/MLI/modelService
 go run main.go
 ```
 
