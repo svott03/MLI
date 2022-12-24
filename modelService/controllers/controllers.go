@@ -26,6 +26,7 @@ var collection *mongo.Collection = configs.GetCollection(configs.DB, "train_data
 
 func UploadModel() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Parse Form
 		fmt.Println("In modelService UploadModel")
 		buf, err := io.ReadAll(c.Request.Body)
 		if err != nil {
@@ -34,6 +35,7 @@ func UploadModel() gin.HandlerFunc {
 			return
 		}
 		fmt.Println("Finished Read")
+		// Write File source code to model.py
 		err4 := os.WriteFile("./files/model.py", buf, 0644)
 		if err4 != nil {
 			log.Fatal(err4)
@@ -46,6 +48,7 @@ func UploadModel() gin.HandlerFunc {
 
 func UploadPredict() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Read predict file
 		fmt.Println("In modelService UploadPredict")
 		buf, err := io.ReadAll(c.Request.Body)
 		if err != nil {
@@ -54,21 +57,22 @@ func UploadPredict() gin.HandlerFunc {
 			return
 		}
 		fmt.Println("Finished Read")
+		// Write to predict.csv
 		err4 := os.WriteFile("./files/predict.csv", buf, 0644)
 		if err4 != nil {
 			log.Fatal(err4)
 			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Reading File"})
 			return
 		}
-		//check if source code exists
-		if _, err := os.Stat("./files/model.py"); err == nil {
+		//check if prediction source code exists
+		if _, err := os.Stat("./files/prediction.py"); err == nil {
 			fmt.Printf("File exists\n")
 		} else {
 			fmt.Printf("File does not exist\n")
 			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
 			return
 		}
-		// exec train model source code
+		// Execute prediction source code
 		cmd := exec.Command("zsh", "-c", "python3 ./files/prediction.py")
 		out, err3 := cmd.Output()
 		if err3 != nil {
@@ -84,7 +88,7 @@ func UploadPredict() gin.HandlerFunc {
 func Train() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("In modelService Train")
-		//check if source code exists
+		// Check if model source code exists
 		if _, err := os.Stat("./files/model.py"); err == nil {
 			fmt.Printf("File exists\n")
 		} else {
@@ -92,30 +96,28 @@ func Train() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Model Source Code needs to be imported."})
 			return
 		}
-		//grab data
+		// Grab previous number of records stored in db
 		res, _ := os.ReadFile("./files/numRecords.txt")
 		s := string(res)
 		s = s[:len(s)-1]
 		prevRecords, _ := strconv.Atoi(s)
 		fmt.Println(prevRecords)
-		// collection.find().skip(collection.count() - prevRecords)
 
+		// Connect to db in MongoDB
 		ctx, cancel := context.WithTimeout(context.Background(), 80*time.Second)
 		var train_data []models.Instance
 		defer cancel()
-		// myOptions := options.Find()
-		// myOptions.SetSort(bson.M{"$natural": prevRecords})
+		// Skip all previous records collected
 		opts := options.Find().SetSort(bson.D{{"$natural", 1}}).SetSkip(int64(prevRecords))
 		results, err := collection.Find(ctx, bson.M{},
 			opts,
 		)
-		// results.skip(prevRecords)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Loading Training Data"})
 			return
 		}
 
-		//reading from the db in an optimal way
+		// Read from db into file
 		w, _ := os.OpenFile("./files/train.csv", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		newly_added := 0
 		defer results.Close(ctx)
@@ -132,10 +134,8 @@ func Train() gin.HandlerFunc {
 			train_data = append(train_data, instance)
 			newly_added++
 			if prevRecords != 0 {
-				// new_inst, _ := gocsv.MarshalString(&s)
 				var s string = "\n"
 				v := reflect.ValueOf(instance)
-
 				for i := 0; i < v.NumField(); i++ {
 					temp := fmt.Sprintf("%v,", v.Field(i).Interface())
 					s += temp
@@ -143,7 +143,6 @@ func Train() gin.HandlerFunc {
 				s = s[:len(s)-1]
 				fmt.Println(s)
 				if _, err := w.WriteString(s); err != nil {
-					//write failed do something
 					log.Fatal("Error appending new data")
 					c.JSON(http.StatusInternalServerError, responses.BasicResponse{Output: "Error in Writing to train.csv"})
 					return
@@ -158,8 +157,7 @@ func Train() gin.HandlerFunc {
 		_, _ = f.WriteString(fmt.Sprintf("%d\n", prevRecords))
 
 		fmt.Println(len(train_data))
-		//output to csv file
-		// to download file inside downloads folder
+		// Append to CSV file
 		file, err := os.OpenFile("./files/train.csv", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			fmt.Println(err)
@@ -167,12 +165,12 @@ func Train() gin.HandlerFunc {
 			return
 		}
 		defer file.Close()
-		// remove header line
+		// If 1st time we MarshalFile, else we append to file in above loop
 		if prevRecords-newly_added == 0 {
 			gocsv.MarshalFile(&train_data, file)
 		}
 
-		// exec train model source code
+		// Execute train model source code
 		cmd := exec.Command("zsh", "-c", "python3 ./files/model.py")
 		out, err3 := cmd.Output()
 		if err3 != nil {
@@ -181,7 +179,7 @@ func Train() gin.HandlerFunc {
 			return
 		}
 		fmt.Println("Output: ", string(out))
-		// send back train statistics
+		// Send back train statistics
 		c.JSON(http.StatusOK, responses.BasicResponse{Output: "Training Complete. Output: " + string(out)})
 	}
 }

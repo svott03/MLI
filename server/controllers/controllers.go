@@ -24,7 +24,7 @@ func GetMainPage() gin.HandlerFunc {
 func UploadModel() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadModel Controller...")
-		// Retrieve and output File
+		// Retrieve File
 		c.Request.ParseMultipartForm(32 << 20)
 		file, handler, err := c.Request.FormFile("file")
 		if err != nil {
@@ -39,12 +39,13 @@ func UploadModel() gin.HandlerFunc {
 			return
 		}
 		defer f.Close()
+		// Output to local file
 		io.Copy(f, file)
-		//send request to modelService
 		data, err2 := os.ReadFile("./files/" + handler.Filename)
 		if err2 != nil {
 			log.Fatal(err2)
 		}
+		// Send request to modelService
 		req, _ := http.NewRequest("POST", "http://localhost:9090/uploadModel", bytes.NewBuffer(data))
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
@@ -52,7 +53,7 @@ func UploadModel() gin.HandlerFunc {
 			return
 		}
 		fmt.Printf("client: status code: %d\n", res.StatusCode)
-		// read response from modelService and pass back to html
+		// Read response from modelService and pass back to html
 		bytes, err := io.ReadAll(res.Body)
 		if err != nil {
 			log.Fatal(err)
@@ -71,6 +72,7 @@ func UploadModel() gin.HandlerFunc {
 func UploadData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadData Controller...")
+		// Retrieve File
 		c.Request.ParseMultipartForm(32 << 20)
 		file, handler, err := c.Request.FormFile("file")
 		if err != nil {
@@ -84,10 +86,11 @@ func UploadData() gin.HandlerFunc {
 			return
 		}
 		defer f.Close()
+		// Output to local file
 		io.Copy(f, file)
 
 		fmt.Println("file Uploaded")
-		// put data into database
+		// Insert new training data into database
 		cmd := exec.Command("zsh", "-c", "mongoimport --uri $MONGO_KEY -d MyDatabase --collection train_data --type=csv --headerline --file ./files/"+handler.Filename)
 		out, err3 := cmd.Output()
 		if err3 != nil {
@@ -102,6 +105,7 @@ func UploadData() gin.HandlerFunc {
 func UploadPredict() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("uploadPredict Controller...")
+		// Retrieve File
 		c.Request.ParseMultipartForm(32 << 20)
 		file, handler, err := c.Request.FormFile("file")
 		if err != nil {
@@ -116,9 +120,10 @@ func UploadPredict() gin.HandlerFunc {
 			return
 		}
 		defer f.Close()
+		// Output to local file
 		io.Copy(f, file)
 
-		//send file to modelService
+		// Send file to modelService
 		data, err2 := os.ReadFile("./files/" + handler.Filename)
 		if err2 != nil {
 			log.Fatal(err2)
@@ -130,7 +135,7 @@ func UploadPredict() gin.HandlerFunc {
 			return
 		}
 		fmt.Printf("client: status code: %d\n", res.StatusCode)
-		// read response from modelService and pass back to html
+		// Read response from modelService and pass back to html
 		bytes, err := io.ReadAll(res.Body)
 		if err != nil {
 			log.Fatal(err)
@@ -153,7 +158,7 @@ func UploadPredict() gin.HandlerFunc {
 func Train() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		fmt.Println("Train Controller...")
-		//send http train request to modelService
+		// Send http train request to modelService
 		req, _ := http.NewRequest("GET", "http://localhost:9090/train", nil)
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
@@ -161,7 +166,7 @@ func Train() gin.HandlerFunc {
 			return
 		}
 		fmt.Printf("client: status code: %d\n", res.StatusCode)
-		// read response from modelService and pass back to html
+		// Read response from modelService and pass back to html
 		bytes, err := io.ReadAll(res.Body)
 		if err != nil {
 			log.Fatal(err)
